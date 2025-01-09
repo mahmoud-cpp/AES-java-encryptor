@@ -1,0 +1,206 @@
+add_round_key Method
+
+Description
+The add_round_key method performs an XOR operation between the plaintext (pt) matrix and the key matrix.
+This operation is a crucial step in AES (Advanced Encryption Standard),
+where it is used to combine the plaintext with a round key.
+
+Parameters
+byte pt[][]: A 2D byte array representing the plaintext.
+
+byte key[][]: A 2D byte array representing the key.
+
+***********************************************
+subbytes Method
+Description
+The subbytes method performs a substitution step in which each byte of the plaintext (pt)
+is replaced with a corresponding byte from the S-Box (sbox).
+
+
+Parameters
+byte pt[][]: A 2D byte array representing the plaintext.
+
+Returns
+This method does not return a value.
+ It directly modifies the pt array by replacing each byte with its 
+corresponding value from the S-Box.
+
+***********************************************
+ shiftrows method
+ shifts the elements of a row array to the left by a specified number of positions y.
+
+Variables:
+
+num2 and num1 are used as indices for looping through the original array.
+
+newpos is used to keep track of the position in the new array newr.
+
+First Loop (Shifting elements from position y to the end of row)
+Second Loop (Shifting elements from the beginning to position y)
+third loop (Copy Back to Original Array)
+
+***********************************************
+***********************************************
+important: 
+ 1-----the way of apply gf(2^8) multiplication is a simplify of (bitwise method called carry-less multiplication)
+ a * b in carry-less multiplication:
+
+While b is not zero, do the following:
+
+Check the Least Significant Bit (LSB) of b:
+
+If the LSB of b is set (1), XOR the result with a.
+
+result ^= a
+
+Shift the Multiplicand (a) Left:
+
+Left shift a by 1.
+
+If the highest bit (which goes beyond the 8th bit) is set, XOR a with the irreducible polynomial to bring it back within GF(2^8).
+
+a <<= 1
+
+If a & 0x100, then a ^= 0x11B
+
+Shift the Multiplier (b) Right:
+
+Right shift b by 1.
+
+b >>= 1
+
+Return the Result:
+
+2--ux note--- things like number of padding and take them as input is to make
+user feel that the result of the program is the
+result of his effort the thing that will make him use the program again.
+***********************************************
+***********************************************
+as a part of gf(2^8) case2 methed do : 
+
+Convert to Unsigned Integer
+Left Shift
+Conditional Reduction by xor with 0x1b
+Return the Resulting Byte
+
+***********************************************
+case3
+
+first calling another method, case2, 
+and then performing an XOR operation between the result and the original byte.
+
+***********************************************
+
+The with_m method applies a different transformation to a byte x based on the value of another byte y.
+
+
+case 1:
+    
+If y is 1, the method returns the original byte x without any transformation.
+
+
+Case 2:
+
+If y is 2, the method calls the case2 method with x as the argument and returns the result.
+
+
+Case 3:
+
+If y is 3, the method calls the case3 method with x as the argument and returns the result.
+
+***********************************************
+
+mix_columns Method
+Description: The mix_columns method transforms the columns of the plaintext (pt)
+matrix using a predefined matrix (fixed).
+It applies a series of multiplications and XOR operations to mix the bytes within each column,
+following the principles of an AES algorithm.
+
+
+Parameters:
+
+byte pt[][]: A 2D byte array representing the plaintext matrix. 
+This matrix will be modified in place.
+
+Returns: This method does not return a value. It directly modifies the pt array by transforming its columns according 
+to the fixed matrix by with_m method.
+
+***********************************************
+
+key_exp Method
+Description: The key_exp method performs a key expansion step where last column rotate by one then
+each byte of the bone column is substituted using an S-Box (sbox)
+and then XORed with a round constant (rcon).
+The resulting bytes are then used to generate the new key matrix:
+
+xor bone column with first column and the result stores in first column and in bone.
+this operation is repeated till the end.
+
+***********************************************
+
+steps Method
+Description: 
+The steps method performs a series of cryptographic transformations on a plaintext array (x).
+It initializes the plaintext matrix (pt) and the key matrix (key),
+then performs multiple rounds of substitution, row shifting, column mixing, and key expansion. Finally,
+the modified plaintext is stored back into the array x.
+
+initial round(add round key)
+
+nine rounds(subbytes -> shiftrows -> mixcolumns -> add round key)
+
+final round(subbytes -> shiftrows -> add round key)
+
+Returns: This method does not return a value.
+It directly modifies the x array by updating it with the transformed plaintext.
+
+***********************************************
+
+main Method
+Description: The main method is the entry point of the program that
+handles encryption and decryption of files. Depending on the user's input,
+it either encrypts or decrypts a file using a series of cryptographic transformations.
+
+in case of num 1 the file will get encrypted 
+
+Open Files and Channels:
+
+try (
+    RandomAccessFile one = new RandomAccessFile(name, "rw"); 
+    RandomAccessFile two = new RandomAccessFile("res.oop", "rw");
+    FileChannel filech = one.getChannel();
+    FileChannel res = two.getChannel();
+) {
+
+Files are opened for reading and writing using RandomAccessFile,
+and channels are created for file operations.
+
+Encryption Loop:
+
+A ByteBuffer of size 16 is created for reading file data.
+
+A while (true) loop reads data from the file into the buffer. It checks the number of bytes read (gate):
+
+If gate is 16, the buffer is flipped, and data is read into the info array .
+
+If gate is less than 16 but not -1, the buffer is flipped, and data is read into a smaller array (info2), then copied into info to manage padding operation.
+
+If gate is -1, the loop breaks (end of file).
+
+
+
+The steps method of the project object is called to encrypt the data.
+
+Data is written back to the result file through the res channel.
+
+in case of num 2 the file will get decrypted 
+
+and num variable will take the number of valid bytes to write from the last block of data
+
+if (one.length() == filech.position() && num != 16)
+                       bytes.put(info, 0, num);
+                    else
+                       bytes.put(info);
+
+with this if -> it check if it was the last amount of bytes in the file.  
+

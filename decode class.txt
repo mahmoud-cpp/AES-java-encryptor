@@ -1,0 +1,106 @@
+keys_maker
+method for generating round keys for the AES
+encryption algorithm. It uses a given key and applies 
+the key expansion process to generate a series of round keys.
+
+in decryption process must use the keys in the opposite arrangement 
+for encryption process so making them first is important.
+
+Project Class Instance:
+
+project pro = new project();
+
+An instance of the project class is created.
+This class presumably contains the key_exp method,
+which performs the key expansion.
+
+Loop through Rounds:
+
+for (int i = 0; i < 10; i++)
+
+The loop iterates through the number of required rounds. 
+For AES-128, there are 10 rounds.
+The loop index i represents the current round.
+
+Copy Current Key to Next Round:
+
+System.arraycopy(keys[i][ii], 0, keys[i+1][ii], 0, 4);
+
+Within each round, the current key (keys[i]) is copied to the
+next round (keys[i+1]) then key expansion applied on (keys[i+1]).
+
+*********************************************************************
+
+invsubbytes:
+
+method for the inverse SubBytes step in the AES decryption process.
+The invsubbytes method applies the inverse S-box (substitution box) to
+each byte in the 4x4 state matrix.
+
+int val;
+
+val = pt[i][o] & 0xff;
+
+convert the byte to int is to avoid any error will 
+happend when applying any bit wise operation.
+
+*********************************************************************
+
+invshiftrows:
+
+method for the inverse ShiftRows step in the AES decryption process.
+The invshiftrows method shifts the rows of the state matrix to 
+the right by a specified number of positions to reverse the ShiftRows 
+operation done during encryption.
+
+*********************************************************************
+
+with_m:
+
+method for performing multiplication operations 
+in the AES MixColumns step. The with_m method takes two bytes,
+x and y, and returns the result of their multiplication 
+according to the specified case(which corresponds to certain constants used in the AES MixColumns step).
+
+*********************************************************************
+
+invmix_columns:
+
+method for the inverse MixColumns step in the AES decryption process.
+The invmix_columns method reverses the MixColumns operation applied during encryption,
+using the specific constants required for the inverse transformation.
+
+each column from state matrix multiplied with the fixed matrix rows.
+
+*************----**-*-*-*-*-*-*-*-*-*
+temp1 and temp2 are calculated using the with_m method,
+which performs the necessary Galois Field multiplications with the fixed matrix constants.
+
+The XOR of temp1 and temp2 gives the transformed value
+, which is stored in the result matrix (res) and the operation is devided to make the operation claer.
+
+*********************************************************************
+
+steps_to_de:
+
+method for performing the full AES decryption process on a block of ciphertext.
+The steps_to_de method includes the steps of inverse operations 
+to revert the encryption, using a given key schedule.
+
+Convert Input to State Matrix (columns is the major)
+Round Keys Array
+Copy Initial Key
+
+Generate Round Keys:
+
+keys_maker(keys);
+
+The keys_maker method is called to generate the round keys for the decryption process
+
+initial round(add round key)
+
+nine rounds(invshiftrows -> invsubbytes -> add_round_key -> invmix_columns)
+
+final round(invshiftrows -> invsubbytes -> add_round_key)
+
+*********************************************************************
